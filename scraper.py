@@ -2,30 +2,33 @@ import credentials
 import requests
 from bs4 import BeautifulSoup
 
-#Logging in to the page
-login_url = "https://www.scrapingcourse.com/login"
-success_title = "Success Page - ScrapingCourse.com"
-payload = {
-    "email": credentials.user,
-    "password": credentials.pwd
-}
 
-#POSTing login info
-response = requests.post(login_url, data=payload)
+
+
+#Logging in to the page
+login_url = "https://www.nbpower.com/Auth/WebLogin.aspx?ReturnUrl=%2fCustomer%2fViewConsumptionGraph.aspx"
+success_title = 'Consumption History'
+payload = {
+    "Username": credentials.user,
+    "Password": credentials.pwd
+}
+#POSTing login info. needs to have language cookie or it will not work
+response = requests.post(login_url, data=payload, cookies={'lang':'en'})
 
 #Data received
 if response.ok:
     soup = BeautifulSoup(response.text, "html.parser")
     title = soup.find('title')
-    if title == None: #Incase the tags are uppercase, may be able to do in regex
-        title = soup.find('TITLE')
 
     if title != None:
-        title = title.text
+        title = title.text.strip()
         if title == success_title:
             print("Login Successful")
+            print(soup)
         else:
+            pass
             print("Issue with login")
+            #print(response.text)
     else:
         print("No title")
 #Issue sending info
